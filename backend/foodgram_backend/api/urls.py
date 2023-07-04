@@ -7,5 +7,7 @@ router = DefaultRouter()
 router.register('users', CustomUserViewSet)
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),
+    path('api/', include('djoser.urls')),
+    path('api/', include('djoser.urls.jwt')),
 ]
