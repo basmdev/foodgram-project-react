@@ -23,7 +23,9 @@ class CustomRecipeFilter(FilterSet):
     tags = filters.AllValuesMultipleFilter(field_name="tags__slug")
     author = filters.ModelChoiceFilter(queryset=User.objects.all())
     is_favorited = filters.BooleanFilter(method="custom_if_is_favorited")
-    is_in_shopping_cart = filters.BooleanFilter(method="custom_if_is_in_shopping_cart")
+    is_in_shopping_cart = filters.BooleanFilter(
+        method="custom_if_is_in_shopping_cart"
+    )
 
     class Meta:
         model = Recipe

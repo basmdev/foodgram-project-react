@@ -57,7 +57,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if not user.is_anonymous:
-            is_favorited = Favorite.objects.filter(user=user, recipe=OuterRef("id"))
+            is_favorited = Favorite.objects.filter(
+                user=user, recipe=OuterRef("id")
+            )
             is_in_shopping_cart = ShoppingCart.objects.filter(
                 user=user, recipe=OuterRef("id")
             )
@@ -72,13 +74,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return ShowRecipeSerializer
         return CreateRecipeSerializer
 
-    @action(detail=False, methods=["GET"], permission_classes=[IsAuthenticated])
+    @action(
+        detail=False, methods=["GET"], permission_classes=[IsAuthenticated]
+    )
     def download_shopping_cart(self, request):
         """Загрузка списка покупок в PDF."""
         final_list = {}
         ingredients = IngredientRecipe.objects.filter(
             recipe__shopping_list__user=request.user
-        ).values_list("ingredient__name", "ingredient__measurement_unit", "amount")
+        ).values_list(
+            "ingredient__name", "ingredient__measurement_unit", "amount"
+        )
         for item in ingredients:
             name = item[0]
             if name not in final_list:
@@ -89,7 +95,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
             else:
                 final_list[name]["amount"] += item[2]
         response = HttpResponse(content_type="application/pdf")
-        response["Content-Disposition"] = 'attachment; filename="shopping_list.pdf"'
+        response[
+            "Content-Disposition"
+        ] = 'attachment; filename="shopping_list.pdf"'
         page = canvas.Canvas(response)
         page.setFont("Helvetica", size=20)
         page.drawString(200, 800, "Список покупок")
@@ -99,7 +107,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             page.drawString(
                 75,
                 height,
-                (f'{i}. {name} - {data["amount"]} ' f'{data["measurement_unit"]}'),
+                (
+                    f'{i}. {name} - {data["amount"]} '
+                    f'{data["measurement_unit"]}'
+                ),
             )
             height -= 25
         page.showPage()
@@ -124,7 +135,9 @@ class FavoritesShoppingCartBasicViewSet(viewsets.ModelViewSet):
 
     def delete(self, request, *args, **kwargs):
         favorite = kwargs.get("id")
-        self.model.objects.filter(user=request.user.id, recipe=favorite).delete()
+        self.model.objects.filter(
+            user=request.user.id, recipe=favorite
+        ).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

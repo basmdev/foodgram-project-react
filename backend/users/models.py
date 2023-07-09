@@ -12,13 +12,17 @@ class User(AbstractUser):
         "first_name",
         "last_name",
     )
-    username = models.CharField(max_length=150, unique=True, verbose_name="username")
+    username = models.CharField(
+        max_length=150, unique=True, verbose_name="username"
+    )
     first_name = models.CharField(max_length=150, verbose_name="Имя")
     last_name = models.CharField(
         max_length=150,
         verbose_name="Фамилия",
     )
-    email = models.EmailField(max_length=254, unique=True, verbose_name="Почта")
+    email = models.EmailField(
+        max_length=254, unique=True, verbose_name="Почта"
+    )
 
     class Meta:
         ordering = ("username",)
@@ -33,7 +37,10 @@ class Follow(models.Model):
     """Модель подписки."""
 
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="follower", verbose_name="Автор"
+        User,
+        on_delete=models.CASCADE,
+        related_name="follower",
+        verbose_name="Автор",
     )
     author = models.ForeignKey(
         User,
@@ -43,7 +50,9 @@ class Follow(models.Model):
     )
 
     class Meta:
-        constraints = [UniqueConstraint(fields=("user", "author"), name="uq_follow")]
+        constraints = [
+            UniqueConstraint(fields=("user", "author"), name="uq_follow")
+        ]
         verbose_name = "Подписка"
         verbose_name_plural = "Подписки"
 

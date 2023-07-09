@@ -14,7 +14,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write(self.style.WARNING("Загрузка начата"))
         try:
-            with open(INGREDIENTS_JSON_PATH, encoding="utf-8") as data_file_ingredients:
+            with open(
+                INGREDIENTS_JSON_PATH, encoding="utf-8"
+            ) as data_file_ingredients:
                 ingredient_data = json.load(data_file_ingredients)
                 for ingredients in ingredient_data:
                     Ingredient.objects.get_or_create(**ingredients)

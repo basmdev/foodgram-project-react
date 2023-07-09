@@ -52,7 +52,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "measurement_unit",
-                    models.CharField(max_length=128, verbose_name="Единица измерения"),
+                    models.CharField(
+                        max_length=128, verbose_name="Единица измерения"
+                    ),
                 ),
             ],
             options={
@@ -101,7 +103,10 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("name", models.CharField(max_length=128, verbose_name="Название")),
+                (
+                    "name",
+                    models.CharField(max_length=128, verbose_name="Название"),
+                ),
                 (
                     "image",
                     models.ImageField(
@@ -114,7 +119,8 @@ class Migration(migrations.Migration):
                     models.PositiveSmallIntegerField(
                         validators=[
                             django.core.validators.MinValueValidator(
-                                1, message="Время приготовления должно быть больше 0"
+                                1,
+                                message="Время приготовления должно быть больше 0",
                             )
                         ],
                         verbose_name="Время приготовления",
@@ -167,7 +173,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "slug",
-                    models.SlugField(max_length=200, unique=True, verbose_name="Адрес"),
+                    models.SlugField(
+                        max_length=200, unique=True, verbose_name="Адрес"
+                    ),
                 ),
             ],
             options={

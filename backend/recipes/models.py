@@ -11,7 +11,9 @@ class Tag(models.Model):
     name = models.CharField(
         max_length=200, db_index=True, unique=True, verbose_name="Название"
     )
-    color = ColorField(max_length=7, format="hex", unique=True, verbose_name="Цвет")
+    color = ColorField(
+        max_length=7, format="hex", unique=True, verbose_name="Цвет"
+    )
     slug = models.SlugField(max_length=200, unique=True, verbose_name="Адрес")
 
     class Meta:
@@ -25,7 +27,9 @@ class Tag(models.Model):
 class Ingredient(models.Model):
     """Модель ингредиента."""
 
-    name = models.CharField(max_length=128, db_index=True, verbose_name="Название")
+    name = models.CharField(
+        max_length=128, db_index=True, verbose_name="Название"
+    )
     measurement_unit = models.CharField(
         max_length=128, verbose_name="Единица измерения"
     )
@@ -42,22 +46,31 @@ class Recipe(models.Model):
     """Модель рецепта."""
 
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="recipes", verbose_name="Автор"
+        User,
+        on_delete=models.CASCADE,
+        related_name="recipes",
+        verbose_name="Автор",
     )
     tags = models.ManyToManyField(Tag, verbose_name="Тег")
     name = models.CharField(max_length=128, verbose_name="Название")
-    image = models.ImageField(upload_to="recipes/image/", verbose_name="Изображение")
+    image = models.ImageField(
+        upload_to="recipes/image/", verbose_name="Изображение"
+    )
     text = models.TextField(verbose_name="Рецепт")
     cooking_time = models.PositiveSmallIntegerField(
         validators=[
-            MinValueValidator(1, message="Время приготовления должно быть больше 0")
+            MinValueValidator(
+                1, message="Время приготовления должно быть больше 0"
+            )
         ],
         verbose_name="Время приготовления",
     )
     ingredients = models.ManyToManyField(
         Ingredient, through="IngredientRecipe", verbose_name="Ингредиенты"
     )
-    pub_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    pub_date = models.DateTimeField(
+        auto_now_add=True, verbose_name="Дата создания"
+    )
 
     class Meta:
         ordering = ("-pub_date",)
@@ -81,7 +94,9 @@ class IngredientRecipe(models.Model):
         Ingredient, on_delete=models.CASCADE, verbose_name="Ингредиент"
     )
     amount = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1, message="Ингредиентов должно быть больше 0")],
+        validators=[
+            MinValueValidator(1, message="Ингредиентов должно быть больше 0")
+        ],
         verbose_name="Количество",
     )
 

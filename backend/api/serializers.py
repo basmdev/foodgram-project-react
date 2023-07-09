@@ -74,7 +74,8 @@ class ShowSubscriptionsSerializer(UserSerializer):
             )
         if user == author:
             raise ValidationError(
-                detail="Подписка на самого себя невозможна", code="self_subscription"
+                detail="Подписка на самого себя невозможна",
+                code="self_subscription",
             )
         return attrs
 
@@ -121,7 +122,9 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
 
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
     name = serializers.ReadOnlyField(source="ingredient.name")
-    measurement_unit = serializers.ReadOnlyField(source="ingredient.measurement_unit")
+    measurement_unit = serializers.ReadOnlyField(
+        source="ingredient.measurement_unit"
+    )
 
     class Meta:
         model = IngredientRecipe
@@ -138,7 +141,9 @@ class ShowRecipeSerializer(serializers.ModelSerializer):
 
     tags = TagSerializer(read_only=False, many=True)
     author = UserSerializer(read_only=True, many=False)
-    ingredients = IngredientRecipeSerializer(many=True, source="ingredient_amount")
+    ingredients = IngredientRecipeSerializer(
+        many=True, source="ingredient_amount"
+    )
     is_favorited = serializers.BooleanField(default=False)
     is_in_shopping_cart = serializers.BooleanField(default=False)
     image = Base64ImageField()
@@ -163,7 +168,9 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
     """Сериализатор создания рецепта."""
 
     ingredients = IngredientRecipeSerializer(many=True)
-    tags = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all())
+    tags = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Tag.objects.all()
+    )
     image = Base64ImageField()
     author = UserSerializer(read_only=True)
 
@@ -242,7 +249,9 @@ class FavoritesCartBasicSerializer(serializers.ModelSerializer):
         if not request or request.user.is_anonymous:
             return False
         recipe = data["recipe"]
-        if self.model.objects.filter(user=request.user, recipe=recipe).exists():
+        if self.model.objects.filter(
+            user=request.user, recipe=recipe
+        ).exists():
             raise serializers.ValidationError({"status": "Уже существует"})
         return data
 
