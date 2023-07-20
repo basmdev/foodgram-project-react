@@ -2,10 +2,11 @@ import json
 
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
+from pathlib import Path
 
 from recipes.models import Ingredient
 
-INGREDIENTS_JSON_PATH = "../data/ingredients.json"
+INGREDIENTS_JSON_PATH = Path("../data") / "ingredients.json"
 
 
 class Command(BaseCommand):
