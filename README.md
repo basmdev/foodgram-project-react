@@ -9,16 +9,16 @@
 - Django 4.2.3
 
 ### Запуск проекта
-Перед запуском проекта, создайте в папке `infra` файл `.env` и заполните его по шаблону `.env.example`.
-Чтобы запустить проект, выполните команду:
-```docker compose up --build```
-Создайте и примените миграции:
-```docker exec foodgram_backend python manage.py makemigrations```
-```docker exec foodgram_backend python manage.py migrate```
-Соберите статику:
-```docker exec foodgram_backend python manage.py collectstatic --noinput```
-Загрузите ингредиенты по желанию с помощью команды:
-```docker exec foodgram_backend python manage.py load_data```
+Перед запуском проекта, создайте в папке `infra` файл `.env` и заполните его по шаблону `.env.example`.  
+Чтобы запустить проект, выполните команду:  
+```docker compose up --build```  
+Создайте и примените миграции:  
+```docker exec foodgram_backend python manage.py makemigrations```  
+```docker exec foodgram_backend python manage.py migrate```  
+Соберите статику:  
+```docker exec foodgram_backend python manage.py collectstatic --noinput```  
+Загрузите ингредиенты по желанию с помощью команды:  
+```docker exec foodgram_backend python manage.py load_data```  
 
 ### Автор проекта
 Магомет Басханов
