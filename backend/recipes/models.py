@@ -1,7 +1,6 @@
 from colorfield.fields import ColorField
 from django.core.validators import MinValueValidator
 from django.db import models
-
 from users.models import User
 
 
@@ -51,7 +50,9 @@ class Recipe(models.Model):
         related_name="recipes",
         verbose_name="Автор",
     )
-    tags = models.ManyToManyField(Tag, verbose_name="Тег")
+    tags = models.ManyToManyField(
+        Tag, related_name="recipes", verbose_name="Тег"
+    )
     name = models.CharField(max_length=128, verbose_name="Название")
     image = models.ImageField(
         upload_to="recipes/image/", verbose_name="Изображение"
@@ -143,7 +144,7 @@ class Favorite(models.Model):
                     "user",
                     "recipe",
                 ),
-                name="uq_favorite",
+                name="uq_user_recipe",
             )
         ]
 

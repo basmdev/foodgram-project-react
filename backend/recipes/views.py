@@ -1,21 +1,38 @@
-from django.db.models import Exists, OuterRef
-from django.http.response import HttpResponse
-from django_filters.rest_framework import DjangoFilterBackend
-from reportlab.pdfgen import canvas
-from rest_framework import status, viewsets
-from rest_framework.decorators import action
-from rest_framework.permissions import (AllowAny, IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
-from rest_framework.response import Response
+from io import BytesIO
 
 from api.filters import CustomIngredientFilter, CustomRecipeFilter
 from api.pagination import CustomPaginator
 from api.permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
-from api.serializers import (CreateRecipeSerializer, FavoriteSerializer,
-                             IngredientSerializer, ShoppingCartSerializer,
-                             ShowRecipeSerializer, TagSerializer)
-from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
-                            ShoppingCart, Tag)
+from api.serializers import (
+    CreateRecipeSerializer,
+    FavoriteSerializer,
+    IngredientSerializer,
+    ShoppingCartSerializer,
+    ShowRecipeSerializer,
+    TagSerializer,
+)
+from django.db.models import Count, Exists, OuterRef
+from django.http.response import HttpResponse
+from django_filters.rest_framework import DjangoFilterBackend
+from recipes.models import (
+    Favorite,
+    Ingredient,
+    IngredientRecipe,
+    Recipe,
+    ShoppingCart,
+    Tag,
+)
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
+from rest_framework.response import Response
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -63,11 +80,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
             is_in_shopping_cart = ShoppingCart.objects.filter(
                 user=user, recipe=OuterRef("id")
             )
-            return Recipe.objects.prefetch_related("ingredients").annotate(
-                is_favorited=Exists(is_favorited),
-                is_in_shopping_cart=Exists(is_in_shopping_cart),
+            return (
+                Recipe.objects.select_related("author", "tags")
+                .prefetch_related("ingredients")
+                .annotate(
+                    is_favorited=Exists(is_favorited),
+                    is_in_shopping_cart=Exists(is_in_shopping_cart),
+                    recipes_count=Count("author__recipes"),
+                )
             )
-        return Recipe.objects.all()
+        return (
+            Recipe.objects.select_related("author", "tags")
+            .prefetch_related("ingredients")
+            .all()
+        )
 
     def get_serializer_class(self):
         if self.request.method == "GET":
@@ -94,14 +120,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 }
             else:
                 final_list[name]["amount"] += item[2]
-        response = HttpResponse(content_type="application/pdf")
-        response[
-            "Content-Disposition"
-        ] = 'attachment; filename="shopping_list.pdf"'
-        page = canvas.Canvas(response)
-        page.setFont("Helvetica", size=20)
+
+        buffer = BytesIO()
+        page = canvas.Canvas(buffer)
+        pdfmetrics.registerFont(TTFont("FreeSans", "../fonts/FreeSans.ttf"))
+        page.setFont("FreeSans", 20)
         page.drawString(200, 800, "Список покупок")
-        page.setFont("Helvetica", size=16)
+        page.setFont("FreeSans", 16)
         height = 700
         for i, (name, data) in enumerate(final_list.items(), 1):
             page.drawString(
@@ -115,6 +140,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             height -= 25
         page.showPage()
         page.save()
+        buffer.seek(0)
+        response = HttpResponse(
+            buffer.getvalue(), content_type="application/pdf"
+        )
+        response[
+            "Content-Disposition"
+        ] = 'attachment; filename="shopping_list.pdf"'
         return response
 
 
@@ -144,7 +176,9 @@ class FavoritesShoppingCartBasicViewSet(viewsets.ModelViewSet):
 class FavoriteViewSet(FavoritesShoppingCartBasicViewSet):
     """Вьюсет модели избранного."""
 
-    queryset = Favorite.objects.all()
+    queryset = Favorite.objects.select_related("author").prefetch_related(
+        "recipes"
+    )
     serializer_class = FavoriteSerializer
     model = Favorite
 
@@ -152,6 +186,8 @@ class FavoriteViewSet(FavoritesShoppingCartBasicViewSet):
 class ShoppingCartViewSet(FavoritesShoppingCartBasicViewSet):
     """Вьюсет списка покупок."""
 
-    queryset = ShoppingCart.objects.all()
+    queryset = ShoppingCart.objects.select_related("author").prefetch_related(
+        "recipes"
+    )
     serializer_class = ShoppingCartSerializer
     model = ShoppingCart

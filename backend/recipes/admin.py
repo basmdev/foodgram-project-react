@@ -1,7 +1,13 @@
 from django.contrib import admin
 
-from .models import (Favorite, Ingredient, IngredientRecipe, Recipe,
-                     ShoppingCart, Tag)
+from .models import (
+    Favorite,
+    Ingredient,
+    IngredientRecipe,
+    Recipe,
+    ShoppingCart,
+    Tag,
+)
 
 
 class IngredientInline(admin.TabularInline):
@@ -55,6 +61,12 @@ class RecipeAdmin(admin.ModelAdmin):
     )
     empty_value_display = "-"
     inlines = (IngredientInline,)
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        queryset = queryset.select_related("author")
+        queryset = queryset.prefetch_related("ingredients", "tags")
+        return queryset
 
 
 @admin.register(Favorite)

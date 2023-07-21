@@ -1,3 +1,5 @@
+from api.pagination import CustomPaginator
+from api.serializers import ShowSubscriptionsSerializer, UserSerializer
 from django.db.models import Exists, OuterRef
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
@@ -5,9 +7,6 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
-from api.pagination import CustomPaginator
-from api.serializers import ShowSubscriptionsSerializer, UserSerializer
 from users.models import Follow, User
 
 
@@ -45,7 +44,9 @@ class UserViewSet(UserViewSet):
     @action(detail=False)
     def subscriptions(self, request):
         user = request.user
-        queryset = User.objects.filter(following__user=user)
+        queryset = User.objects.filter(following__user=user).prefetch_related(
+            "recipes"
+        )
         pages = self.paginate_queryset(queryset)
         serializer = ShowSubscriptionsSerializer(
             pages, many=True, context={"request": request}

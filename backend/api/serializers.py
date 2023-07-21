@@ -1,11 +1,16 @@
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
+from recipes.models import (
+    Favorite,
+    Ingredient,
+    IngredientRecipe,
+    Recipe,
+    ShoppingCart,
+    Tag,
+)
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SerializerMethodField
-
-from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
-                            ShoppingCart, Tag)
 from users.models import Follow, User
 
 
@@ -44,7 +49,7 @@ class ShowSubscriptionsSerializer(UserSerializer):
     """Сериализатор подписок."""
 
     recipes = SerializerMethodField()
-    recipes_count = SerializerMethodField()
+    recipes_count = serializers.IntegerField()
 
     class Meta:
         model = User
@@ -78,9 +83,6 @@ class ShowSubscriptionsSerializer(UserSerializer):
                 code="self_subscription",
             )
         return attrs
-
-    def get_recipes_count(self, obj):
-        return obj.recipes.count()
 
     def get_recipes(self, obj):
         request = self.context.get("request")
