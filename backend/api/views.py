@@ -11,7 +11,10 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
 from rest_framework.response import Response
 
 from api.filters import CustomRecipeFilter
@@ -103,10 +106,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     recipes_count=Count("author__recipes"),
                 )
             )
-        return (
-            Recipe.objects.select_related("author", "tags")
-            .prefetch_related("ingredients")
-        )
+        return Recipe.objects.select_related(
+            "author", "tags"
+        ).prefetch_related("ingredients")
 
     def get_serializer_class(self):
         if self.request.method == "GET":
@@ -157,7 +159,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         buffer.seek(0)
         return buffer
 
-    @action(detail=False, methods=["GET"], permission_classes=[IsAuthenticated])
+    @action(
+        detail=False, methods=["GET"], permission_classes=[IsAuthenticated]
+    )
     def download_shopping_cart(self, request):
         """Загрузка списка покупок в PDF."""
         try:
@@ -179,6 +183,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             "Content-Disposition"
         ] = 'attachment; filename="shopping_list.pdf"'
         return response
+
     # def download_shopping_cart(self, request):
     #     """Загрузка списка покупок в PDF."""
     #     final_list = {}
