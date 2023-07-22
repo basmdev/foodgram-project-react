@@ -3,6 +3,7 @@ from pathlib import Path
 
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
+
 from recipes.models import Ingredient
 
 current_script_path = Path(__file__).resolve().parent

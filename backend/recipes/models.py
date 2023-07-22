@@ -1,6 +1,7 @@
 from colorfield.fields import ColorField
 from django.core.validators import MinValueValidator
 from django.db import models
+
 from users.models import User
 
 
@@ -92,7 +93,10 @@ class IngredientRecipe(models.Model):
         verbose_name="Рецепт",
     )
     ingredient = models.ForeignKey(
-        Ingredient, on_delete=models.CASCADE, verbose_name="Ингредиент"
+        Ingredient,
+        on_delete=models.CASCADE,
+        related_name="ingredient_recipes",
+        verbose_name="Ингредиент",
     )
     amount = models.PositiveSmallIntegerField(
         validators=[
