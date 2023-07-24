@@ -14,8 +14,7 @@
 Чтобы запустить проект, выполните команду:  
 ```docker compose up --build```  
   
-Создайте и примените миграции:  
-```docker exec foodgram_backend python manage.py makemigrations```  
+Примените миграции:  
 ```docker exec foodgram_backend python manage.py migrate```  
   
 Соберите статику:  

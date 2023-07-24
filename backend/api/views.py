@@ -119,7 +119,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         detail=False, methods=["GET"], permission_classes=[IsAuthenticated]
     )
     def generate_shopping_list_pdf(self, recipe):
-        """Создание списка покупок."""
         final_list = {}
         ingredients = IngredientRecipe.objects.filter(
             recipe__shopping_list__user=self.request.user,
@@ -136,7 +135,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 }
             else:
                 final_list[name]["amount"] += item[2]
+        return final_list
 
+    def create_shopping_list_pdf(self, recipe):
+        final_list = self.generate_shopping_list_pdf(recipe)
         buffer = BytesIO()
         page = canvas.Canvas(buffer)
         pdfmetrics.registerFont(TTFont("FreeSans", "../fonts/FreeSans.ttf"))
@@ -163,18 +165,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
         detail=False, methods=["GET"], permission_classes=[IsAuthenticated]
     )
     def download_shopping_cart(self, request):
-        """Загрузка списка покупок в PDF."""
         try:
             recipe_id = request.query_params.get("recipe_id", None)
             if recipe_id:
                 recipe = Recipe.objects.get(pk=recipe_id)
             else:
-                # If no recipe ID provided, use the first recipe of the user
                 recipe = Recipe.objects.filter(author=request.user).first()
         except ObjectDoesNotExist:
             return HttpResponse("Recipe not found.", status=404)
 
-        buffer = self.generate_shopping_list_pdf(recipe)
+        buffer = self.create_shopping_list_pdf(recipe)
 
         response = HttpResponse(
             buffer.getvalue(), content_type="application/pdf"
@@ -183,49 +183,3 @@ class RecipeViewSet(viewsets.ModelViewSet):
             "Content-Disposition"
         ] = 'attachment; filename="shopping_list.pdf"'
         return response
-
-    # def download_shopping_cart(self, request):
-    #     """Загрузка списка покупок в PDF."""
-    #     final_list = {}
-    #     ingredients = IngredientRecipe.objects.filter(
-    #         recipe__shopping_list__user=request.user
-    #     ).values_list(
-    #         "ingredient__name", "ingredient__measurement_unit", "amount"
-    #     )
-    #     for item in ingredients:
-    #         name = item[0]
-    #         if name not in final_list:
-    #             final_list[name] = {
-    #                 "measurement_unit": item[1],
-    #                 "amount": item[2],
-    #             }
-    #         else:
-    #             final_list[name]["amount"] += item[2]
-
-    #     buffer = BytesIO()
-    #     page = canvas.Canvas(buffer)
-    #     pdfmetrics.registerFont(TTFont("FreeSans", "../fonts/FreeSans.ttf"))
-    #     page.setFont("FreeSans", 20)
-    #     page.drawString(200, 800, "Список покупок")
-    #     page.setFont("FreeSans", 16)
-    #     height = 700
-    #     for i, (name, data) in enumerate(final_list.items(), 1):
-    #         page.drawString(
-    #             75,
-    #             height,
-    #             (
-    #                 f'{i}. {name} - {data["amount"]} '
-    #                 f'{data["measurement_unit"]}'
-    #             ),
-    #         )
-    #         height -= 25
-    #     page.showPage()
-    #     page.save()
-    #     buffer.seek(0)
-    #     response = HttpResponse(
-    #         buffer.getvalue(), content_type="application/pdf"
-    #     )
-    #     response[
-    #         "Content-Disposition"
-    #     ] = 'attachment; filename="shopping_list.pdf"'
-    #     return response
