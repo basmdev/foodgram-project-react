@@ -127,9 +127,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return ShowRecipeSerializer
         return CreateRecipeSerializer
 
-    @action(
-        detail=False, methods=["GET"], permission_classes=[IsAuthenticated]
-    )
     def generate_shopping_list_pdf(self, recipe):
         final_list = {}
         ingredients = IngredientRecipe.objects.filter(

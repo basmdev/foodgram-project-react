@@ -6,7 +6,7 @@ from .models import (
     IngredientRecipe,
     Recipe,
     ShoppingCart,
-    Tag
+    Tag,
 )
 
 
@@ -83,7 +83,7 @@ class FavoriteAdmin(admin.ModelAdmin):
     empty_value_display = "-"
 
     def get_queryset(self, request):
-        queryset = super().get_queryset(request).select_related("recipe")
+        queryset = super().get_queryset(request).select_related("recipe, user")
         return queryset
 
 
@@ -98,5 +98,5 @@ class ShoppingCartAdmin(admin.ModelAdmin):
     empty_value_display = "-"
 
     def get_queryset(self, request):
-        queryset = super().get_queryset(request).select_related("recipe")
+        queryset = super().get_queryset(request).select_related("recipe, user")
         return queryset
