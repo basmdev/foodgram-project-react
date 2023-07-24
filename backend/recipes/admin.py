@@ -1,13 +1,6 @@
 from django.contrib import admin
 
-from .models import (
-    Favorite,
-    Ingredient,
-    IngredientRecipe,
-    Recipe,
-    ShoppingCart,
-    Tag,
-)
+from .models import Favorite, Ingredient, IngredientRecipe, Recipe, ShoppingCart, Tag
 
 
 class IngredientInline(admin.TabularInline):
@@ -83,12 +76,7 @@ class FavoriteAdmin(admin.ModelAdmin):
     empty_value_display = "-"
 
     def get_queryset(self, request):
-        queryset = (
-            super()
-            .get_queryset(request)
-            .select_related("author")
-            .prefetch_related("ingredients", "tags")
-        )
+        queryset = super().get_queryset(request).select_related("recipe")
         return queryset
 
 
@@ -103,10 +91,5 @@ class ShoppingCartAdmin(admin.ModelAdmin):
     empty_value_display = "-"
 
     def get_queryset(self, request):
-        queryset = (
-            super()
-            .get_queryset(request)
-            .select_related("author")
-            .prefetch_related("ingredients", "tags")
-        )
+        queryset = super().get_queryset(request).select_related("recipe")
         return queryset

@@ -4,6 +4,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SerializerMethodField
 
+from users.models import Follow, User
 from recipes.models import (
     Favorite,
     Ingredient,
@@ -12,7 +13,6 @@ from recipes.models import (
     ShoppingCart,
     Tag,
 )
-from users.models import Follow, User
 
 
 class UserSerializer(UserSerializer):
