@@ -21,7 +21,9 @@ services:
     container_name: foodgram_backend
 
   frontend:
-    image: magfrg/foodgram_backend
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
