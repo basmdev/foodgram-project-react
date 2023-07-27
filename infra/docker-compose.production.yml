@@ -21,9 +21,7 @@ services:
     container_name: foodgram_backend
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: magfrg/foodgram_frontend
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
@@ -42,7 +40,7 @@ services:
       - media_value:/var/html/media/
     depends_on:
       - backend
-    container_name: foodgram_nginx
+      - frontend
 
 volumes:
   postgres_data:

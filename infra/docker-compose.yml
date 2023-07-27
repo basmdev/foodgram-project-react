@@ -44,7 +44,7 @@ services:
       - media_value:/var/html/media/
     depends_on:
       - backend
-    container_name: foodgram_nginx
+      - frontend
 
 volumes:
   postgres_data:
