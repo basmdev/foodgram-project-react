@@ -9,6 +9,4 @@ RUN apt-get update && apt-get upgrade -y && \
 
 COPY . .
 
-RUN chmod +x entrypoint.sh
-
-ENTRYPOINT ["./entrypoint.sh"]
+CMD ["gunicorn", "foodgram.wsgi:application", "--bind", "0:8000" ]
