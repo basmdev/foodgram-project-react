@@ -104,23 +104,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if not user.is_anonymous:
             is_favorited = Favorite.objects.filter(
-                user=user, recipe=OuterRef("id")
+                user=user,
+                recipe=OuterRef('id')
             )
             is_in_shopping_cart = ShoppingCart.objects.filter(
-                user=user, recipe=OuterRef("id")
+                user=user,
+                recipe=OuterRef('id')
             )
-            return (
-                Recipe.objects.select_related("author", "tags")
-                .prefetch_related("ingredients")
-                .annotate(
-                    is_favorited=Exists(is_favorited),
-                    is_in_shopping_cart=Exists(is_in_shopping_cart),
-                    recipes_count=Count("author__recipes"),
-                )
+            return Recipe.objects.prefetch_related('ingredients').annotate(
+                is_favorited=Exists(is_favorited),
+                is_in_shopping_cart=Exists(is_in_shopping_cart)
             )
-        return Recipe.objects.select_related(
-            "author", "tags"
-        ).prefetch_related("ingredients")
+        return Recipe.objects.all()
 
     def get_serializer_class(self):
         if self.request.method == "GET":
