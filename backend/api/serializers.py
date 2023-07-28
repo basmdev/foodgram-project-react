@@ -1,6 +1,6 @@
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
-from rest_framework import serializers
+from rest_framework import serializers, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SerializerMethodField
 
@@ -48,49 +48,47 @@ class CreateUserSerializer(UserCreateSerializer):
 
 class ShowSubscriptionsSerializer(UserSerializer):
     """Сериализатор подписок."""
-
     recipes = SerializerMethodField()
-    recipes_count = serializers.IntegerField()
+    recipes_count = SerializerMethodField()
 
     class Meta:
         model = User
         fields = (
-            "id",
-            "username",
-            "email",
-            "first_name",
-            "last_name",
-            "is_subscribed",
-            "recipes",
-            "recipes_count",
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+            'recipes',
+            'recipes_count',
         )
-        read_only_fields = (
-            "email",
-            "username",
-            "first_name",
-            "last_name",
-        )
+        read_only_fields = ('email', 'username', 'first_name', 'last_name',)
 
-    def validate(self, attrs):
+    def validate(self, data):
         author = self.instance
-        user = self.context.get("request").user
+        user = self.context.get('request').user
         if Follow.objects.filter(author=author, user=user).exists():
             raise ValidationError(
-                detail="Подписка уже существует", code="existing_subscription"
+                detail='Подписка уже существует.',
+                code=status.HTTP_400_BAD_REQUEST,
             )
         if user == author:
             raise ValidationError(
-                detail="Подписка на самого себя невозможна",
-                code="self_subscription",
+                detail='Нельзя подписаться на самого себя.',
+                code=status.HTTP_400_BAD_REQUEST,
             )
-        return attrs
+        return data
+
+    def get_recipes_count(self, obj):
+        return obj.recipes.count()
 
     def get_recipes(self, obj):
-        request = self.context.get("request")
-        recipes_limit = request.GET.get("recipes_limit")
+        request = self.context.get('request')
+        recipes_limit = request.GET.get('recipes_limit')
         recipes = obj.recipes.all()
         if recipes_limit:
-            recipes = recipes[: int(recipes_limit)]
+            recipes = recipes[:int(recipes_limit)]
         serializer = DemoRecipeSerializer(recipes, many=True, read_only=True)
         return serializer.data
 
