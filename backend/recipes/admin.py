@@ -52,6 +52,10 @@ class RecipeAdmin(admin.ModelAdmin):
         "author",
         "tags",
     )
+    list_filter = (
+        "author",
+        "tags",
+    ) 
     empty_value_display = "-"
     inlines = (IngredientInline,)
 
