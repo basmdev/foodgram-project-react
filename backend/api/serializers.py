@@ -217,7 +217,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop("ingredients")
         self.create_ingredients(instance, ingredients)
         return super().update(instance, validated_data)
-    
+
     def to_representation(self, instance):
         return ShowRecipeSerializer(
             instance, context={"request": self.context.get("request")}
